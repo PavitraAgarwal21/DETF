@@ -6,11 +6,10 @@ import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/IQuoter.sol";
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
-
-
-contract DETF  {
+contract DETF is ERC20 {
 address public owner ; 
 uint public tokenTotalSupply ; 
 mapping (address => uint256 ) public balances  ;
@@ -37,7 +36,7 @@ address[] public holders;
 event Deposited(address indexed user, uint256 amount); 
 event Redeemed (address indexed user, uint256 amount); 
 
-constructor(ISwapRouter _swapRouter ) {
+constructor(ISwapRouter _swapRouter ) ERC20("DETF", "DETF") {
     swapRouter     = _swapRouter;
     // require(_factory != address(0), "Invalid Factory Address");
     // factory = _factory ;  
@@ -199,6 +198,8 @@ modifier onlyOwner() {
         // The call to `exactInputSingle` executes the swap given the route.
         amountOut = swapRouter.exactInputSingle(params);
     }
+
+
 
 
 
