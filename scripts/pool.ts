@@ -114,7 +114,6 @@ async function main() {
         0
     );
     console.log("The quoted amount out is", immutables.token0,  immutables.token1, immutables.fee,    amountIn.toString());
-
     // create a trade object
     // only allow trade to be routed through poolExample
     const swapRoute = new Route([poolExample], TokenA, TokenB);
@@ -127,10 +126,7 @@ async function main() {
         ),
         tradeType: TradeType.EXACT_INPUT,
       });
-
     console.log("The quoted amount out is", quotedAmountOut.toString());
     console.log("The unchecked trade object is", uncheckedTradeExample);
-
 }
-
 main()

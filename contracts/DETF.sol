@@ -89,7 +89,25 @@ modifier onlyOwner() {
     _;
 }
 
-function calculateToBuyMutualFundTokens(uint256 _indexAmount ) public  returns (uint256 ) {
+
+
+function calculateToBuyMutualFundTokens(uint256 _indexAmount ) public   returns (uint256[] memory) {
+    uint256[] memory totalwethamount = new uint256[](underlyingTokenList.length);
+    for (uint i = 0; i < underlyingTokenList.length; i++) {
+        address token = underlyingTokenList[i];
+        uint256 amount = getunderlyingTokensAmount(token);
+        if (amount > 0 ) {
+         uint256 totalTokenAmount = (amount * _indexAmount) * (10 ** _decimals);
+         uint256 amountOut = quote.quoteExactInputSingle( weth_add , token , 3000, totalTokenAmount, 0 );
+         totalwethamount[i] = amountOut;
+        }
+    }
+    return totalwethamount ; 
+}
+
+
+
+function calculateToSellMutualFundTokens(uint256 _indexAmount ) public  returns (uint256[] memory) {
     uint256[] memory totalwethamount = new uint256[](underlyingTokenList.length);
     for (uint i = 0; i < underlyingTokenList.length; i++) {
         address token = underlyingTokenList[i];
@@ -97,13 +115,38 @@ function calculateToBuyMutualFundTokens(uint256 _indexAmount ) public  returns (
 
         if (amount > 0 ) {
          uint256 totalTokenAmount = (amount * _indexAmount) * (10 ** _decimals);
-         uint256 amountOut = quote.quoteExactInputSingle( weth_add , token , 3000, totalTokenAmount, 0 );
+         uint256 amountOut = quote.quoteExactOutputSingle( token ,weth_add, 3000, totalTokenAmount, 0 );
          totalwethamount[i] = amountOut;
-         console.log(amountOut);
         }
     }
-    return 3 ; 
+    return totalwethamount ; 
 }
+
+function totalWethTokenToBuyIndexToken(uint256 _indexToken ) public  returns (uint256) {
+    uint256[] memory totalwethtobuy = calculateToBuyMutualFundTokens(_indexToken) ; 
+    return sum(totalwethtobuy) ; 
+}
+
+function totalWethTokenToSellIndexToken(uint256 _indexToken ) public  returns (uint256) {
+    uint256[] memory totalwethtosell = calculateToSellMutualFundTokens(_indexToken) ; 
+    return sum(totalwethtosell) ; 
+
+}
+ function sum(uint256[] memory numbers) internal pure returns (uint256) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < numbers.length; i++) {
+            total += numbers[i];
+        }
+        return total;
+    }
+
+
+
+// now want i want is to mint the indextoken when this equal amount is transacfered
+
+
+// same with the sell part ok the main part is to make the swap ok  
+
 
  function swapExactInputSinglee(uint256 amountIn) external returns (uint256 amountOut) {
     address DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;

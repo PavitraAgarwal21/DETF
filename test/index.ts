@@ -79,10 +79,11 @@ const usdc_add  = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" ;
 
   // we have to initialize the swaper contract with the token addresses
 
-      tx = await swaper.connect(signer).callStatic.calculateToBuyMutualFundTokens(ethers.utils.parseUnits('1', 18)) ; 
-      console.log("get the out put ",tx) ;
+      tx = await swaper.connect(signer).callStatic.totalWethTokenToBuyIndexToken(1) ; 
+      console.log("buy  ",tx) ;
 
-
+      tx = await swaper.connect(signer).callStatic.totalWethTokenToSellIndexToken(1) ; 
+      console.log("sell  ",tx) ;
   
 
   // approve swapper contract to spend for 1 WETH 
