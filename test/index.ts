@@ -82,16 +82,25 @@ const usdc_add  = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" ;
       tx = await swaper.connect(signer).callStatic.totalWethTokenToBuyIndexToken(1) ; 
       console.log("buy  ",tx) ;
 
+      tx = await weth_contract.deposit(overrides)
+      await tx.wait()
       tx = await swaper.connect(signer).callStatic.totalWethTokenToSellIndexToken(1) ; 
       console.log("sell  ",tx) ;
+
   
+      // tx = await weth_contract.approve(swaper.address, ethers.utils.parseEther('10'))
+      // await tx.wait()
+      
+
+      // tx = await swaper.connect(signer).callStatic.mint(1) ;
+      // console.log("mint  ",tx) ;
 
   // approve swapper contract to spend for 1 WETH 
-  // tx = await weth_contract.approve(swaper.address, ethers.utils.parseEther('1'))
-  // await tx.wait()
+  tx = await weth_contract.approve(swaper.address, ethers.utils.parseEther('1'))
+  await tx.wait()
   // 1 WETH -> DAI 
-  // tx = await swaper.swapExactInputSingle(ethers.utils.parseEther('1'))
-  // await tx.wait()
+  tx = await swaper.connect(signer).callStatic.swapExactInputSinglee(ethers.utils.parseEther('1'))
+  console.log("swapping vmount out value ",tx) ; // tx.wait()
 
   // confirm DAI token balance 
   // num_weth = ethers.utils.formatEther((await weth_contract.balanceOf(signer.address)))

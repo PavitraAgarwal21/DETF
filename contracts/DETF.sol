@@ -58,6 +58,7 @@ function initialize(
 _decimals = _tokenDecimals ;
 weth_add = _weth ; 
 
+
 quote = IQuoter(_quoteAddress) ;
 require (_underlyingTokens.length > 0 , "No asset under their Mutual Fund") ;
 require ( _underlyingTokens.length == _underlyingTokensAmount.length , "Invalid input array") ;
@@ -143,7 +144,41 @@ function totalWethTokenToSellIndexToken(uint256 _indexToken ) public  returns (u
 
 
 // now want i want is to mint the indextoken when this equal amount is transacfered
+function mint(uint256 _indexToken )  external returns (uint256) {
 
+
+uint256[] memory wethrequired = calculateToBuyMutualFundTokens(_indexToken) ; 
+// require(msg.value >= sum(wethrequired) , "Invalid amount of WETH") ;  
+uint256 [] memory amounts = new uint256[](underlyingTokenList.length); 
+
+
+// this is the main part comes here want it do is very great 
+
+address token = underlyingTokenList[0] ; 
+uint256 amount = underlyingTokens[token]; 
+uint256 totalTokenAmount = (amount * _indexToken) * (10 ** _decimals); 
+uint256 requireweth = wethrequired[0] ; 
+
+        TransferHelper.safeTransferFrom(weth_add , msg.sender, address(this), requireweth);
+        TransferHelper.safeApprove(weth_add , address(swapRouter), requireweth );
+
+// covert from weth to the token  ; 
+ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: weth_add,
+                tokenOut: token,
+                fee: 30000,
+                recipient: msg.sender,
+                deadline: block.timestamp,
+                amountIn: requireweth,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+
+        // The call to `exactInputSingle` executes the swap given the route.
+        uint256 amountOut = swapRouter.exactInputSingle(params);
+        return amountOut ; 
+} 
 
 // same with the sell part ok the main part is to make the swap ok  
 
@@ -155,11 +190,17 @@ function totalWethTokenToSellIndexToken(uint256 _indexToken ) public  returns (u
         // For this example, we will set the pool fee to 0.3%.
         uint24 poolFee = 3000;
         // msg.sender must approve this contract
+    uint256 _indexToken = 1 ; 
         address tokenIn = WETH9; 
-        address tokenOut = DAI;
+        address tokenOut = underlyingTokenList[0];
+        uint256 amount = underlyingTokens[tokenOut];  
+        uint256 totalTokenAmount = (amount * _indexToken) * (10 ** _decimals); // amount of token
+
+
         // Transfer the specified amount of _ to this contract.
         // note: this contract must first be approved by msg.sender 
         // token, from, to, value
+
         TransferHelper.safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
         // // similar code using barebones ERC20 token -- TransferHelper uses low-level call() 
         // uint balance = IERC20(tokenIn).balanceOf(msg.sender);
@@ -185,6 +226,12 @@ function totalWethTokenToSellIndexToken(uint256 _indexToken ) public  returns (u
         // The call to `exactInputSingle` executes the swap given the route.
         amountOut = swapRouter.exactInputSingle(params);
     }
+
+
+
+
+
+
 
 
 
