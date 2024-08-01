@@ -89,6 +89,7 @@ async function main() {
     const TokenA = new Token(3, immutables.token0, 6, "USDC", "USD Coin");
     const TokenB = new Token(3, immutables.token1, 18, "WETH", "Wrapped Ether");
   
+    
     const poolExample = new Pool(
         TokenA,
         TokenB,
@@ -103,6 +104,7 @@ async function main() {
     const quoterAddress = "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6";
     const quoterContract = new ethers.Contract(quoterAddress, QuoterABI, provider);
 
+
     const amountIn = 1500;
     const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
         immutables.token0,
@@ -111,6 +113,7 @@ async function main() {
         amountIn.toString(),
         0
     );
+    console.log("The quoted amount out is", immutables.token0,  immutables.token1, immutables.fee,    amountIn.toString());
 
     // create a trade object
     // only allow trade to be routed through poolExample
